@@ -7,4 +7,8 @@ require (
 	github.com/lib/pq v1.10.9
 )
 
-require github.com/go-chi/chi v1.5.4 // indirect
+require (
+	github.com/aws/aws-sdk-go v1.44.334 // indirect
+	github.com/go-chi/chi v1.5.4 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+)
