@@ -7,13 +7,17 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/inaciogu/go-notifications/internal/application/usecase"
+	"github.com/inaciogu/go-notifications/internal/infra/messaging/consumer"
 	"github.com/inaciogu/go-notifications/internal/infra/repository/postgres"
 	"github.com/inaciogu/go-notifications/internal/infra/web/handlers"
+	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
 )
 
 func main() {
+	godotenv.Load(".env")
+
 	db, err := sql.Open("postgres", "postgres://root:password@localhost:5432/notifications?sslmode=disable")
 
 	if err != nil {
@@ -28,6 +32,10 @@ func main() {
 	listRecipientNotifications := usecase.NewListRecipientNotifications(repo)
 
 	notificationHandler := handlers.NewNotificationHandler(createNotification, listRecipientNotifications)
+
+	notificationConsumer := consumer.NewNotificationConsumer(createNotification)
+
+	go notificationConsumer.Start()
 
 	router := chi.NewRouter()
 
