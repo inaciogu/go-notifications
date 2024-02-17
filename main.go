@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/inaciogu/go-notifications/internal/application/usecase"
 	"github.com/inaciogu/go-notifications/internal/infra/messaging/consumer"
 	"github.com/inaciogu/go-notifications/internal/infra/repository/postgres"
@@ -38,6 +39,8 @@ func main() {
 	go notificationConsumer.Start()
 
 	router := chi.NewRouter()
+
+	router.Use(middleware.Logger)
 
 	router.Post("/notifications", notificationHandler.Create)
 	router.Get("/notifications/from/{id}", notificationHandler.ListManyByRecipient)
