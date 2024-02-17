@@ -14,7 +14,7 @@ type ListRecipientNotificationsInput struct {
 	RecipientID string `json:"recipient_id"`
 }
 
-type ListRecipientNotificationsOutputItem struct {
+type ListRecipientNotificationsOutput struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
 	Body        string `json:"body"`
@@ -24,25 +24,21 @@ type ListRecipientNotificationsOutputItem struct {
 	DeletedAt   string `json:"deleted_at"`
 }
 
-type ListRecipientNotificationsOutput struct {
-	Notifications []*ListRecipientNotificationsOutputItem `json:"notifications"`
-}
-
 func NewListRecipientNotifications(notificationRepository repository.NotificationRepository) *ListRecipientNotifications {
 	return &ListRecipientNotifications{notificationRepository: notificationRepository}
 }
 
-func (c *ListRecipientNotifications) Execute(ctx context.Context, input *ListRecipientNotificationsInput) (*ListRecipientNotificationsOutput, error) {
+func (c *ListRecipientNotifications) Execute(ctx context.Context, input *ListRecipientNotificationsInput) ([]*ListRecipientNotificationsOutput, error) {
 	notifications, err := c.notificationRepository.ListByRecipient(ctx, input.RecipientID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var outputNotifications []*ListRecipientNotificationsOutputItem
+	var outputNotifications []*ListRecipientNotificationsOutput
 
 	for _, notification := range notifications {
-		outputNotifications = append(outputNotifications, &ListRecipientNotificationsOutputItem{
+		outputNotifications = append(outputNotifications, &ListRecipientNotificationsOutput{
 			ID:          notification.ID,
 			Title:       notification.Title,
 			Body:        notification.Body,
@@ -53,7 +49,5 @@ func (c *ListRecipientNotifications) Execute(ctx context.Context, input *ListRec
 		})
 	}
 
-	return &ListRecipientNotificationsOutput{
-		Notifications: outputNotifications,
-	}, nil
+	return outputNotifications, nil
 }
