@@ -4,22 +4,23 @@ import (
 	"context"
 
 	"github.com/inaciogu/go-notifications/internal/application/usecase"
-	sqsclient "github.com/inaciogu/go-sqs/consumer"
+	"github.com/inaciogu/go-sqs/consumer"
 	"github.com/inaciogu/go-sqs/consumer/message"
 )
 
 type NotificationConsumer struct {
-	*sqsclient.SQSClient
+	*consumer.SQSClient
 }
 
 func NewNotificationConsumer(createNotification *usecase.CreateNotification) *NotificationConsumer {
-	sqsclient := sqsclient.New(nil, sqsclient.SQSClientOptions{
+	sqsclient := consumer.New(nil, consumer.SQSClientOptions{
 		QueueName: "notifications",
 		Handle: func(message *message.Message) bool {
 			handled := handleNotification(message, createNotification)
 
 			return handled
 		},
+		LogLevel: "debug",
 	})
 
 	return &NotificationConsumer{
